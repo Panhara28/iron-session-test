@@ -8,7 +8,7 @@ import { revalidatePath } from 'next/cache'
 
 const MUTATION = gql`
   mutation UserLoginMutation($input: UserLoginInput) {
-  userLoginMutation(input: $input) {
+  userLogin(input: $input) {
     user {
       id
       username
@@ -22,8 +22,8 @@ const MUTATION = gql`
 `
 
 const QUERY = gql`
-  query GetMeQuery($input: SessionInput) {
-    getMeQuery(input: $input) {
+  query getMe($input: SessionInput) {
+    getMe(input: $input) {
       id
       username
     }
@@ -73,26 +73,26 @@ export async function loginServerAction(credentials: { username: string, passwor
     fetchPolicy: "no-cache",
   });
 
-  const { userLoginMutation } = data;
+  const { userLogin } = data;
 
   const ip = getClientIp()
 
-  if (userLoginMutation.user) {
+  if (userLogin.user) {
 
-    sessions.set(userLoginMutation.session.sessionId, {
-      userId: userLoginMutation.user.id,
-      username: userLoginMutation.user.username,
-      sessionToken: userLoginMutation.session.sessionToken,
+    sessions.set(userLogin.session.sessionId, {
+      userId: userLogin.user.id,
+      username: userLogin.user.username,
+      sessionToken: userLogin.session.sessionToken,
       ip,
       lastAccessed: Date.now(),
       created: Date.now()
     })
 
     const session: any = await getServerActionSession()
-    session.sessionId = userLoginMutation.session.sessionId
+    session.sessionId = userLogin.session.sessionId
     await session.save()
     revalidatePath("/");
-    return { status: 200, sessionToken: `${userLoginMutation.session.sessionToken}`, }
+    return { status: 200, sessionToken: `${userLogin.session.sessionToken}`, }
   } else {
     return { status: 401, message: 'Invalid username or password' }
   }
