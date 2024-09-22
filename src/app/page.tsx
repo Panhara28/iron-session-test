@@ -16,6 +16,7 @@ export default function Home() {
       if (sessionToken) {
         try {
           const result = await getUserInfoServerAction(sessionToken);
+          console.log("result", result)
           if (result) {
             setUserInfo({ username: result.username });
             if (result.newSessionToken) {
@@ -43,14 +44,16 @@ export default function Home() {
   const handleLogin = async () => {
     try {
       const result: any = await loginServerAction({ username, password });
-      setLoginStatus(result.message);
+      console.log("result", result)
+      setLoginStatus(result.sessionToken);
       if (result.status === 200) {
         localStorage.setItem('sessionToken', result.sessionToken);
         setSessionToken(result.sessionToken);
         const user = await getUserInfoServerAction(result.sessionToken);
-        if (user) {
-          setUserInfo({ username: user.username });
-        }
+        console.log("user", user)
+        // if (user) {
+        //   setUserInfo({ username: user.username });
+        // }
       }
     } catch (error) {
       setLoginStatus('Login failed. Please try again.');
