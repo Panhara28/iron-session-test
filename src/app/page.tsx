@@ -1,13 +1,8 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Image from 'next/image';
 import styles from './page.module.css';
 import { getUserInfoServerAction, loginServerAction, logoutServerAction } from './serverActions';
-import {
-  submitCookieToStorageRouteHandler,
-  readCookieFromStorageRouteHandler
-} from './clientActions'
 
 export default function Home() {
   const [username, setUsername] = useState('');
@@ -15,7 +10,6 @@ export default function Home() {
   const [loginStatus, setLoginStatus] = useState('');
   const [userInfo, setUserInfo]: any = useState(null);
   const [sessionToken, setSessionToken] = useState(process.browser && localStorage.getItem('sessionToken'));
-  const [currentCookie, setCurrentCookie] = useState('')
 
   useEffect(() => {
     const checkSession = async () => {
@@ -77,10 +71,6 @@ export default function Home() {
     }
   };
 
-  const handleSubmitCookieViaRouteHandler = async () => {
-    submitCookieToStorageRouteHandler(currentCookie)
-  }
-
   return (
     <main className={styles.main}>
       <div className={styles.description}>
@@ -114,30 +104,6 @@ export default function Home() {
           </div>
         )}
         <p>{loginStatus}</p>
-      </div>
-
-      <p>
-        Current Cookie: &nbsp;
-        <input
-          type="text"
-          id="currentCookie"
-          name="currentCookie"
-          placeholder="Enter Value Here"
-          value={currentCookie}
-          onChange={(event) => setCurrentCookie(event.target.value)}
-        />
-      </p>
-
-      <div
-        className={styles.card}
-        onClick={handleSubmitCookieViaRouteHandler}
-      >
-        <h2>
-          Set Cookie via API Route Handler <span>-&gt;</span>
-        </h2>
-        <p>Set Current Cookie:&nbsp;
-          <b>{currentCookie || "Not Set Yet"} </b>
-          to storage</p>
       </div>
     </main>
   );
