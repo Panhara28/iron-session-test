@@ -29,7 +29,7 @@ export default function Home() {
             setSessionToken(null);
           }
         } catch (error) {
-          console.error('Session validation failed', error);
+          console.log('Session validation failed', error);
           localStorage.removeItem('sessionToken');
           setSessionToken(null);
         }
