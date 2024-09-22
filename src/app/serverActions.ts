@@ -49,14 +49,6 @@ function getClientIp() {
     clientIp = remoteAddr
   }
 
-  // Log all relevant information for debugging
-  console.log('IP Detection:', {
-    forwardedFor,
-    realIp,
-    remoteAddr,
-    detectedIp: clientIp
-  })
-
   return clientIp
 }
 
@@ -92,6 +84,7 @@ export async function loginServerAction(credentials: { username: string, passwor
     session.sessionId = userLogin.session.sessionId
     await session.save()
     revalidatePath("/");
+    console.log("userLogin.session.sessionToken", userLogin.session.sessionToken)
     return { status: 200, sessionToken: `${userLogin.session.sessionToken}`, }
   } else {
     return { status: 401, message: 'Invalid username or password' }
@@ -101,24 +94,7 @@ export async function loginServerAction(credentials: { username: string, passwor
 export async function getUserInfoServerAction(sessionToken: string) {
   const session: any = await getServerActionSession()
   const sessionId = session.sessionId
-
-  const { data: { getMeQuery } } = await client.query({
-    query: QUERY,
-    variables: {
-      input: {
-        sessionToken,
-        sessionId
-      }
-    }
-  });
-
   const ip = getClientIp()
-
-  console.log('Get user info attempt:', { sessionId, ip })
-  console.log("data", !sessionId || !sessions.has(sessionId))
-  // if (!sessionId || !sessions.has(sessionId)) {
-  //   return null
-  // }
 
   const userSession = sessions.get(sessionId);
   // In development, don't validate IP
@@ -126,11 +102,6 @@ export async function getUserInfoServerAction(sessionToken: string) {
   const ipValid = isLocalhost || userSession.ip === ip
 
   if (userSession?.sessionToken !== sessionToken || !ipValid || Date.now() - userSession?.created > 24 * 60 * 60 * 1000) {
-    console.log('Session validation failed:', {
-      tokenMatch: userSession.sessionToken === sessionToken,
-      ipValid,
-      sessionAge: (Date.now() - userSession.created) / 1000 / 60 / 60 + ' hours'
-    })
     sessions.delete(sessionId)
     return null
   }
@@ -147,8 +118,6 @@ export async function getUserInfoServerAction(sessionToken: string) {
 export async function logoutServerAction() {
   const session: any = await getServerActionSession()
   const sessionId = session.sessionId
-
-  console.log('Logout attempt:', { sessionId })
 
   if (sessionId) {
     sessions.delete(sessionId)
