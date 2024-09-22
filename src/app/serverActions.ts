@@ -92,6 +92,7 @@ export async function loginServerAction(credentials: { username: string, passwor
 }
 
 export async function getUserInfoServerAction(sessionToken: string) {
+  //ទាក់ទងនឹង Server 
   const session: any = await getServerActionSession()
   const sessionId = session.sessionId
   const ip = getClientIp()

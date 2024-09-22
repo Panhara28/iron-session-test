@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import styles from './page.module.css';
 import { getUserInfoServerAction, loginServerAction, logoutServerAction } from './serverActions';
+import Cookies from 'js-cookie';
 
 export default function Home() {
   const [username, setUsername] = useState('');
